@@ -1,0 +1,13 @@
+fastapi==0.115.6
+uvicorn==0.34.0
+streamlit==1.41.1
+requests==2.32.3
+python-multipart==0.0.20
+pydantic==2.10.5
+pydantic-settings==2.7.1
+sqlalchemy==2.0.37
+pillow==11.1.0
+numpy==2.2.2
+loguru==0.7.3
+python-dotenv==1.0.1
+google-genai==1.39.1
