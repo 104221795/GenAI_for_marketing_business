@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from loguru import logger
 
 from app.config import settings
+from app.services.visual_providers.cloudflare_flux_provider import CloudflareFluxProvider
+from app.services.visual_providers.google_imagen_provider import GoogleImagenProvider
 from app.services.visual_providers.gemini_image_provider import GeminiImageProvider
 from app.services.visual_providers.replicate_flux_provider import ReplicateFluxProvider
 from app.services.visual_providers.mock_provider import MockVisualProvider
+from app.services.visual_providers.original_provider import OriginalImageProvider
 
 
 class VisualService:
@@ -12,8 +17,12 @@ class VisualService:
 
     def _build_provider_chain(self):
         registry = {
+            "cloudflare_flux": CloudflareFluxProvider,
+            "google_imagen": GoogleImagenProvider,
+            "imagen": GoogleImagenProvider,
             "gemini_image": GeminiImageProvider,
             "replicate_flux": ReplicateFluxProvider,
+            "original": OriginalImageProvider,
             "mock": MockVisualProvider,
         }
 
@@ -40,7 +49,7 @@ class VisualService:
         disabled_providers = {}
 
         for i in range(num_variants):
-            output_path = f"storage/output/{asset_id}_v{i + 1}.jpg"
+            output_path = str(Path(settings.STORAGE_DIR) / "output" / f"{asset_id}_v{i + 1}.jpg")
             result = self._generate_one(
                 asset_id,
                 i,
@@ -118,5 +127,6 @@ class VisualService:
             "payment method",
             "rate limit",
             "throttled",
+            "missing cloudflare_account_id",
         ]
         return any(marker in text for marker in markers)

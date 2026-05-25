@@ -28,6 +28,7 @@ class VariantResult(BaseModel):
     image_path: str
     provider: str
     scores: Dict[str, float]
+    technical_diagnostics: Dict[str, Any] = Field(default_factory=dict)
 
 
 class GenerationResult(BaseModel):
@@ -50,9 +51,21 @@ class GenerationResult(BaseModel):
 
 class ReviewRequest(BaseModel):
     status: str
+    identity_verified: bool = False
     reviewer_note: Optional[str] = None
     description: Optional[str] = None
     caption: Optional[str] = None
     hashtags: Optional[List[str]] = None
     channel_outputs: Optional[Dict[str, Any]] = None
     best_variant_id: Optional[str] = None
+
+
+class ImageEvaluationRequest(BaseModel):
+    compared_with_original: bool = False
+    product_fidelity: int = Field(ge=1, le=5)
+    scene_quality: int = Field(ge=1, le=5)
+    photorealism: int = Field(ge=1, le=5)
+    prompt_adherence: int = Field(ge=1, le=5)
+    publish_readiness: int = Field(ge=1, le=5)
+    failure_modes: List[str] = Field(default_factory=list)
+    reviewer_comment: Optional[str] = None

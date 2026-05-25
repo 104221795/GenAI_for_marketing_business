@@ -86,3 +86,8 @@ class ExportService:
             z.writestr("content/cta_suggestions.txt", "\n".join(channel_outputs["cta_suggestions"]))
         if channel_outputs.get("hashtags"):
             z.writestr("content/hashtags.txt", " ".join(channel_outputs["hashtags"]))
+        if channel_outputs.get("product_analysis"):
+            z.writestr(
+                "content/product_analysis.json",
+                json.dumps(channel_outputs["product_analysis"], ensure_ascii=False, indent=2),
+            )

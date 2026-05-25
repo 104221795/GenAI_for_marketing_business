@@ -136,6 +136,9 @@ Pipeline improvements:
 
 - Added campaign context to image prompts.
 - Added campaign context to LLM copy generation.
+- Connected the original product image to Gemini text generation for grounded product recognition and detailed sales copy.
+- Added structured `product_analysis` output: detected product type, observed description, visible details, condition observations, buyer-appeal points, and unknown/unverified details.
+- Displayed product analysis in the UI and included it in export packages as `content/product_analysis.json`.
 - Added channel-specific marketing outputs:
   - SEO title
   - Product description
@@ -147,13 +150,14 @@ Pipeline improvements:
   - CTA suggestions
   - Hashtags
 - Added quality report generation.
-- Added more marketing-oriented scoring dimensions:
-  - aesthetic score
-  - prompt alignment proxy
-  - product visibility proxy
-  - reference format similarity proxy
-  - brand consistency proxy
-  - commercial readiness proxy
+- Replaced weak prompt-length and variant-index scoring proxies with technical image screening:
+  - contrast readability
+  - exposure balance
+  - clipped-pixel quality
+  - detail signal
+  - resolution sufficiency
+  - optional reference-palette similarity
+- Added saved image-model evaluations with a 40% product-fidelity weight and hard failure tags for altered product condition or identity.
 
 ## 7. Review Workflow Updates
 
@@ -219,6 +223,7 @@ Provider improvements:
 - Added safer provider error logging.
 - Added configuration warnings for likely wrong provider setup.
 - Fixed invalid Gemini image model name.
+- Added `google_imagen` visual provider through the Gemini API Imagen endpoint.
 
 Current Gemini image model:
 
@@ -235,6 +240,16 @@ gemini-3-pro-image-preview
 ```
 
 The app now supports `GEMINI_IMAGE_MODEL_CHAIN`, so the `gemini_image` provider can try more than one Gemini image model before falling back to the next visual provider.
+
+Google Imagen settings:
+
+```env
+VISUAL_PROVIDER_CHAIN=google_imagen,mock
+GOOGLE_IMAGEN_MODEL=imagen-4.0-generate-001
+GOOGLE_IMAGEN_ASPECT_RATIO=1:1
+```
+
+Important limitation: `google_imagen` is an input-aware text-to-image fallback in this app. It uses Gemini Text/Vision to summarize uploaded product/reference images, then sends those summaries into Imagen. This is useful as another fallback, but it is not pixel-level product editing like Gemini Image/Nano Banana or Vertex AI Imagen Editing.
 
 ## 10. Evaluation Framework
 
@@ -258,7 +273,7 @@ Evaluation criteria:
 | Trust and compliance | 10% |
 | System reliability | 10% |
 
-The Streamlit app also includes an Evaluation tab with a weighted 100-point scoring tool.
+The Streamlit app now includes an image-model benchmark in Evaluation with side-by-side original/output review, structured failure modes, persisted assessments, and per-provider identity-pass and publishable rates.
 
 ## 11. Environment Guidance
 

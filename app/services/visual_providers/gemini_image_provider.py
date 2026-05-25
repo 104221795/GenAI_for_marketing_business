@@ -99,14 +99,15 @@ Use the first uploaded image as the exact product identity.
 Editing instruction:
 {visual_prompt}
 
-Hard constraints:
-- Preserve the same product identity.
-- Preserve visible logo, sponsor text, color, collar, sleeves, fabric texture and product details.
-- Do not invent a different product.
+Non-destructive product lock, highest priority:
+- Treat the product as a locked photographic foreground layer. Preserve the exact product category, silhouette, proportions, geometry, orientation, camera angle, color, material, texture, logo, label, readable text, pattern, hardware, stitching, packaging, and visible condition.
+- Treat the first image as the only source of truth for the product. Use a second image only for composition and atmosphere.
+- Change only pixels outside the product silhouette: the background, supporting surface, external shadow, and non-obscuring scene props requested in the instruction.
+- Do not re-render, retouch, relight, invent, redesign, recolor, repair, rebrand, relabel, or cover any part of the product.
+- Do not add cracks, scratches, creases, dents, stains, discoloration, extra texture, new reflections, new wear, or damage to the product.
+- Do not remove or hide condition details already visible in the source.
 - Do not add a person.
-- Do not hang the shirt unless the prompt asks for it.
-- Make the final image look like a natural product marketing photograph, not a sticker pasted on a background.
-- Match realistic perspective, realistic shadows, realistic wrinkles and lighting.
+- Make the background and external grounding shadow look like a natural product marketing photograph without altering the product surface.
 - Output only the edited image.
 
 Variant:

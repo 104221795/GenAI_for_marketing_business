@@ -44,6 +44,7 @@ class AssetRepository:
         hashtags: list[str] | None = None,
         channel_outputs: dict | None = None,
         best_variant_id: str | None = None,
+        identity_verified: bool = False,
     ):
         asset = self.get(asset_id)
         if not asset:
@@ -77,6 +78,7 @@ class AssetRepository:
                     value is not None
                     for value in [description, caption, hashtags, channel_outputs]
                 ),
+                "identity_verified": identity_verified,
             },
         )
         return asset
@@ -119,6 +121,14 @@ class AssetRepository:
         return (
             self.db.query(AssetEvent)
             .filter(AssetEvent.asset_id == asset_id)
+            .order_by(AssetEvent.created_at.asc())
+            .all()
+        )
+
+    def list_events_by_type(self, event_type: str) -> list[AssetEvent]:
+        return (
+            self.db.query(AssetEvent)
+            .filter(AssetEvent.event_type == event_type)
             .order_by(AssetEvent.created_at.asc())
             .all()
         )

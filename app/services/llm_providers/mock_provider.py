@@ -4,7 +4,15 @@ from app.services.llm_providers.base import LLMProvider
 class MockLLMProvider(LLMProvider):
     name = "mock"
 
-    def generate(self, product_name, visual_prompt, content_prompt, tone, campaign_context=None) -> dict:
+    def generate(
+        self,
+        product_name,
+        visual_prompt,
+        content_prompt,
+        tone,
+        campaign_context=None,
+        product_image_path: str | None = None,
+    ) -> dict:
         campaign_context = campaign_context or {}
         name = product_name or "pre-owned fashion item"
         brand = campaign_context.get("brand_name") or "the shop"

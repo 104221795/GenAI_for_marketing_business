@@ -5,14 +5,14 @@ from app.core.schemas import GenerationRequest, GenerationResult, VariantResult
 from app.core.status import GENERATED, FAILED
 from app.services.visual_service import VisualService
 from app.services.scoring_service import ScoringService
-from app.services.llm_service import LLMService
+from app.services.llm_gateway import LLMGateway
 
 
 class ProductPromotionPipeline:
     def __init__(self):
         self.visual_service = VisualService()
         self.scoring_service = ScoringService()
-        self.llm_service = LLMService()
+        self.llm_service = LLMGateway()
 
     def run(
         self,
@@ -39,6 +39,7 @@ class ProductPromotionPipeline:
                 variants=variants,
                 visual_prompt=enriched_visual_prompt,
                 reference_image_path=reference_image_path,
+                product_image_path=product_image_path,
             )
 
             best = self.scoring_service.pick_best(scored_variants)
@@ -54,6 +55,7 @@ class ProductPromotionPipeline:
                 content_prompt=request.content_prompt,
                 tone=request.tone,
                 campaign_context=campaign_context,
+                product_image_path=product_image_path,
             )
 
             visual_provider_used = ",".join(sorted(set(v.get("provider", "unknown") for v in scored_variants)))
@@ -118,13 +120,5 @@ class ProductPromotionPipeline:
         }
 
     def _build_visual_prompt(self, request: GenerationRequest, campaign_context: dict) -> str:
-        context_lines = [
-            f"Campaign: {campaign_context.get('campaign_name') or 'product marketing campaign'}",
-            f"Brand: {campaign_context.get('brand_name') or 'small fashion seller'}",
-            f"Target audience: {campaign_context.get('target_audience') or 'fashion buyers'}",
-            f"Platform: {campaign_context.get('platform')}",
-            f"Marketing objective: {campaign_context.get('marketing_objective')}",
-            f"Funnel stage: {campaign_context.get('funnel_stage')}",
-            f"Selling points: {campaign_context.get('selling_points') or 'product identity and visual quality'}",
-        ]
-        return request.visual_prompt + "\n\nMarketing context:\n" + "\n".join(context_lines)
+        # Image editors need a controlled visual specification; sales metadata causes prompt drift.
+        return request.visual_prompt

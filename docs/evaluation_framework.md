@@ -43,6 +43,48 @@ Weighted score formula:
 Final score = sum((criterion_score / 5) * criterion_weight)
 ```
 
+Identity approval gate:
+
+- The automated technical screen does not prove product preservation.
+- Any AI-edited product without `source_product_overlay` must be compared against the original image before it can be approved; the review action enforces this confirmation.
+- Any changed logo, label, color, material surface, or visible condition is a failed product-identity check, regardless of the weighted score.
+- A transparent PNG result marked `source_product_overlay` retains the original product layer, but still requires normal publishing review.
+
+## Image Generation Model Benchmark
+
+The system evaluation rubric above measures the workflow as a product. Image-generation provider quality should be measured separately because a technically successful run can still damage the photographed product.
+
+The Evaluation workspace stores one structured assessment per reviewed output using this fidelity-heavy rubric:
+
+| Image Model Criterion | Weight | Excellent Standard |
+| --- | ---: | --- |
+| Product fidelity | 40% | Shape, logo or label, color, material, hardware, and visible condition match the original image. |
+| Scene quality | 20% | Background and product placement look professionally art-directed. |
+| Photorealism | 15% | Edges, scale, contact shadow, and lighting appear physically convincing. |
+| Scene adherence | 10% | The output follows the selected scenario without unwanted additions. |
+| Publish readiness | 15% | No corrective regeneration is needed before publication. |
+
+Identity failures are recorded as structured tags:
+
+| Failure Mode | Interpretation |
+| --- | --- |
+| Introduced damage or wear | The model added cracks, scratches, stains, creases, or other false condition details. |
+| Changed logo or text | Branding, labels, or legible printed details no longer match. |
+| Changed color or material | Product appearance is commercially misleading. |
+| Altered shape or hardware | Silhouette, clasp, strap, buttons, or construction changed. |
+| Product obscured or cropped | The selected scene interferes with product inspection. |
+| Unrealistic scene or shadow | Integration quality is poor even when identity is retained. |
+| Scene does not match request | The scenario prompt was not followed adequately. |
+
+Model decision policy:
+
+1. The evaluator must view the original product and generated output side by side before submitting a valid model assessment.
+2. Any product-identity failure makes the result `failed_product_identity`, even when its numerical score is high.
+3. A `publishable_candidate` requires no recorded failure, a product-fidelity rating of at least 4/5, a publish-readiness rating of at least 4/5, and a weighted score of at least 80/100.
+4. Report results per model/provider, not only across all outputs, so a cheap fallback model cannot be hidden inside system averages.
+
+Automated technical screening complements but does not replace this benchmark. It measures output dimensions, exposure balance, clipping, detail signal, contrast readability, and optional reference-palette similarity. These measurements cannot isolate the product silhouette or detect a newly invented crack reliably.
+
 ## Suggested User Study
 
 Use 5 to 10 reviewers. Suitable reviewer profiles:
@@ -70,6 +112,10 @@ For each product:
 | Best-variant agreement | Whether reviewers agree with the system-selected best variant |
 | Copy usefulness score | Whether generated copy fits platform and buyer intent |
 | Trust score | Whether reviewers believe the asset is transparent and credible |
+| Identity pass rate by image provider | Percentage of provider outputs without a recorded product-identity failure |
+| Publishable rate by image provider | Percentage of provider outputs meeting the strict publishable-candidate rule |
+| Mean product fidelity by image provider | Whether a model preserves products consistently across categories and scenes |
+| Failure-mode frequency by image provider | Which defects, such as new cracks or changed logos, make a model unsuitable |
 
 ## Example Evaluation Summary
 
